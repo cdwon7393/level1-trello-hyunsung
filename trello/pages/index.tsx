@@ -1,35 +1,26 @@
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AccordionProvider, Box, Button, Image } from '@chakra-ui/react'
+import { Box, Button, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Stack, Text, useDisclosure } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import { useState } from 'react';
-import List_component from '../src/components/three-images'
+import { useState } from 'react'
+import List_templet from '../src/List_templet'
 
-export type Task = {
+export type TaskType = {
+  type: number;
   id: number;
+  title: string;
   description: string;
 }
 
 const Home: NextPage = () => {
-
-  const [data, setData] = useState([ 
-    { id: 1, description: 'TODO' },
-    { id: 2, description: 'DOING' },
-    { id: 3, description: 'DONE' },
-    { id: 4, description: 'BACKLOG' }
-  ]);
-
-  // 할일 목록 진행 전 진행 중 끝 => 3개 List / 추가, 삭제 
-
-  const item2component = (task: Task) => (
-    <List_component
-      key={task.id}
-      task={task}
-    />
-  )
-
+  const [tasks0, setTasks0] = useState<TaskType[]>([]);
+  const [tasks1, setTasks1] = useState<TaskType[]>([]);
+  const [tasks2, setTasks2] = useState<TaskType[]>([]);
   return (
-
-    <Box display='flex' alignItems='stretch'>
-      {data.map(item2component)}
+    <Box display="flex" justifyContent="space-between" p={4}>
+      <List_templet src0 = {tasks0} src1 = {tasks1} src2 = {tasks2} title="To Do" type = {0} />
+      <Box w={4} />
+      <List_templet src0 = {tasks0} src1 = {tasks1} src2 = {tasks2}  title="Doing" type = {1}/>
+      <Box w={4} />
+      <List_templet src0 = {tasks0} src1 = {tasks1} src2 = {tasks2}  title="Done" type = {2}/>
     </Box>
   )
 }
