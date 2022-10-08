@@ -1,8 +1,8 @@
 import { Box } from '@chakra-ui/react'
 import type { NextPage } from 'next'
-import { NextSeo } from 'next-seo'
 import React, { useState } from 'react'
-import List_templet from '../src/List_templet'
+import ListTemplate from '../src/ListTemplate'
+
 
 export type TaskType = {
   id: number; 
@@ -117,11 +117,11 @@ const Home: NextPage = () => {
   return (
     <TrelloContext.Provider value={{ tasks, addTask, deleteTask, updateTask, moveUpTask, moveDownTask, moveRightTask, moveLeftTask,}}>
     <Box display="flex" justifyContent="space-between" p={4}>
-      <List_templet title="To Do" index = {0} />
+      <ListTemplate title="To Do" index = {0} />
       <Box w={4} />
-      <List_templet title="Doing" index = {1}/>
+      <ListTemplate title="Doing" index = {1}/>
       <Box w={4} />
-      <List_templet title="Done" index = {2}/>
+      <ListTemplate title="Done" index = {2}/>
     </Box>
     </TrelloContext.Provider>
   )
