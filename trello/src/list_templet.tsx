@@ -1,132 +1,127 @@
 import { Box, Button, Heading, Input, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, Stack, Text, useDisclosure } from "@chakra-ui/react";
 import { type } from "os";
-import { TaskType } from "../pages"; 
-import { useState } from "react";
 import { BsTrashFill } from "react-icons/bs";
 import { BsFillArrowUpSquareFill } from "react-icons/bs";
 import { BsFillArrowDownSquareFill } from "react-icons/bs";
 import { BsFillArrowRightSquareFill} from "react-icons/bs";
 import { BsFillArrowLeftSquareFill } from "react-icons/bs";
+import { NextSeo } from "next-seo";
+import { useContext, useState } from "react";
+import { TaskType, TrelloContext } from "../pages";
 
 
-export default function List_templet(
-  { src0, src1, src2, title: listTitle, type: listType}: 
-  { src0: TaskType[], src1: TaskType[], src2: TaskType[], title: string, type: number }) {
-  const { isOpen, onClose, onOpen } = useDisclosure();
+export default function List_templet({ title: listTitle, index: index}: 
+  { title: string, index: number }) {
+
+  const { isOpen: addModalIsOpen, onClose: onAddModalClose, onOpen: onAddModalOpen } = useDisclosure();
   const { isOpen: updateModalIsOpen, onClose: onUpdateModalClose, onOpen: onUpdateModalOpen } = useDisclosure();
+
   const [currentId, setCurrentId] = useState(-1);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  // const [tasks0, setTasks0] = useState<TaskType[]>(src0);
-  // const [tasks1, setTasks1] = useState<TaskType[]>(src1);
-  // const [tasks2, setTasks2] = useState<TaskType[]>(src2);
-  // const lists = {tasks0, tasks1, tasks2};
-  const [tasks, setTasks] = useState<TaskType[]>([]);
 
+  const { tasks: templetes, addTask, deleteTask, updateTask, moveDownTask, moveLeftTask, moveRightTask, moveUpTask} = useContext(TrelloContext);
+  const tasks = templetes[index];
+
+  const addTask2 = () => {
+    addTask(index, {
+      id: Date.now(),
+      title: title,
+      description: description,
+    });
+    setTitle('');
+    setDescription('');
+    onAddModalClose();
+  };
+  const deleteTask2 = (task: TaskType) => {
+    deleteTask(index, task);
+  }
+  const updateTask2 = (updateTitle: string, updateDescription: string) => {
+    const idx = tasks.findIndex(t => t.id === currentId);
+    updateTask(index, tasks[idx], updateTitle, updateDescription);    
+  };
+  const moveDownTask2 = (task: TaskType) => {
+    moveDownTask(index, task);
+  };
+  const moveUpTask2 = (task: TaskType) => {
+    moveUpTask(index, task);
+  };
+  const moveRightTask2 = (task: TaskType) => {
+    moveRightTask(index, task);
+  };
+  const moveLeftTask2 = (task: TaskType) => {
+    moveLeftTask(index, task);
+  };
 
   return (
+    <>
+    <NextSeo
+      title="hs trello"
+      openGraph={{
+        title: 'hs trello',
+        description: 'this is hs trello',
+        images: [
+          {url : 'https://www.hide-city.com/_asset/img/biography/photo.jpg'}
+        ]
+      }}
+      />
     <Box bg="tomato" flex={1} borderRadius={4} p={4}>
       <Heading>{listTitle}</Heading>
-      <Button onClick={() => {
-  if (listType === 0){
-    setTasks([...src0, ...tasks]);
-  } else if (listType === 1){
-    setTasks([...src1, ...tasks]);
-  } else {
-    setTasks([...src2, ...tasks]);
-  }
 
+      <Button onClick={()=>onAddModalOpen()} >할일 추가</Button>
 
-        onOpen();
-      }}>
-        할일 추가
-      </Button>
       <Stack>
         {tasks.map((task) => (
           
           <Box display = 'flex' justifyContent='space-between' key={task.id} bg="cyan.200" p={4} borderRadius={4}>
             <Box>
-            <Heading fontSize="md">{task.title}</Heading>
-            <Text>{task.description}</Text>
-            <Button onClick={() => {
-              const idx = tasks.findIndex(t => t.id === task.id);
-              setTasks([
-                ...tasks.slice(0, idx),
-                ...tasks.slice(idx + 1),
-              ])
-            }}><BsTrashFill/></Button>
-            <Button onClick={() => {
-              onUpdateModalOpen();
-              setTitle(task.title);
-              setDescription(task.description);
-              setCurrentId(task.id);
-            }}>
-              수정
-            </Button>
+              <Heading fontSize="md">{task.title}</Heading>
+              <Text>{task.description}</Text>
+              <Button onClick={() => deleteTask2(task)}><BsTrashFill/></Button>
+              <Button onClick={() => {
+                onUpdateModalOpen();
+                setTitle(task.title);
+                setDescription(task.description);
+                setCurrentId(task.id);
+              }}>
+                수정
+              </Button>
             </Box>
             <Box display="flex" verticalAlign='middle'>
-              <BsFillArrowLeftSquareFill onClick={() => {
-                const idx = tasks.findIndex(t => t.id === task.id);
-                }}/>
-            <Box display="flex" flexDirection="column" justifyContent='space-evenly'>
-              <BsFillArrowUpSquareFill
-                onClick={() => {
-                  const idx = tasks.findIndex(t => t.id === task.id);
-                  if (idx !== 0) {
-                    setTasks([
-                      ...tasks.slice(0, idx-1),
-                      tasks[idx], tasks[idx-1],
-                      ...tasks.slice(idx + 1),
-                    ])
-              }}}/>
-              <BsFillArrowDownSquareFill
-                onClick={() => {
-                  const idx = tasks.findIndex(t => t.id === task.id);
-                  if (idx !== tasks.length-1) {
-                    setTasks([
-                      ...tasks.slice(0, idx),
-                      tasks[idx+1], tasks[idx],
-                      ...tasks.slice(idx + 2),
-                    ])
-              }}}/>
-              </Box>
-                <BsFillArrowRightSquareFill onClick={() => {
 
-                }}/>
+              <Box display="flex" flexDirection="column" justifyContent="space-evenly">
+              <BsFillArrowLeftSquareFill  onClick={() => moveLeftTask2(task)}/>
+              </Box>
+
+              <Box display="flex" flexDirection="column" justifyContent='space-evenly'>
+                <BsFillArrowUpSquareFill onClick={() => moveUpTask2(task)}/>
+                <BsFillArrowDownSquareFill onClick={() => moveDownTask2(task)}/>
+              </Box>
+              
+              <Box display="flex" flexDirection="column" justifyContent="space-evenly">
+              <BsFillArrowRightSquareFill onClick={() => moveRightTask2(task)}/>
+              </Box>
+
             </Box>
           </Box>
         ))}
 
       </Stack>
-      <Modal isOpen={isOpen} onClose={onClose}>
+
+      <Modal isOpen={addModalIsOpen} onClose={onAddModalClose}>
         <ModalContent>
-          <ModalHeader>할일 추가</ModalHeader>
+          <ModalHeader>Add Task</ModalHeader>
           <ModalBody>
             <Input placeholder="title" value={title} onChange={(e) => setTitle(e.target.value)} />
             <Input placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} />
           </ModalBody>
           <ModalFooter>
-            <Button onClick={() => {
-              // 카드 추가
-              setTasks([
-                {
-                  type: listType,
-                  id: Date.now(),
-                  title: title,
-                  description,
-                },                 
-                ...tasks
-              ]);
-              // 입력값 초기화
-              setTitle('');
-              setDescription('');
-              // 모달 닫기
-              onClose();
-            }}>추가하기</Button>
-            <Button variant="text" onClick={onClose}>닫기</Button>
+            <Button onClick={() => addTask2()}>Add</Button>
+            <Button variant="text" onClick={onAddModalClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
+
       <Modal isOpen={updateModalIsOpen} onClose={onUpdateModalClose}>
         <ModalContent>
           <ModalHeader>카드 수정</ModalHeader>
@@ -135,23 +130,12 @@ export default function List_templet(
             <Input placeholder="description" value={description} onChange={(e) => setDescription(e.target.value)} />
           </ModalBody>
           <ModalFooter>
-            <Button onClick={() => {
-              const idx = tasks.findIndex(t => t.id === currentId);
-              setTasks([
-                ...tasks.slice(0, idx),
-                {
-                  type: listType,
-                  id: currentId,
-                  title,
-                  description,
-                },
-                ...tasks.slice(idx + 1),
-              ]);
-              onUpdateModalClose();
-            }}>수정하기</Button>
+            <Button onClick={() => updateTask2(title, description)}>수정하기</Button>
+            <Button variant="text" onClick={onUpdateModalClose}>Close</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>
     </Box>
+    </>
   )
 }
